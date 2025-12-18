@@ -170,3 +170,9 @@ cython_debug/
 .cursorrules
 # Keep Agent.md as documentation
 
+# Cursor workspace state (never commit)
+.cursor/
+
+# Logfire local credentials/state (never commit)
+.logfire/
+
