@@ -1,17 +1,18 @@
 from dataclasses import dataclass
 from uuid import UUID
-from typing import List, Optional
+
 from qdrant_bench.domain.entities.core import Run, RunStatus
-from qdrant_bench.ports.repositories import RunRepository, ExperimentRepository
+from qdrant_bench.ports.repositories import ExperimentRepository, RunRepository
+
 
 @dataclass
 class TriggerRunCommand:
     experiment_id: UUID
 
+@dataclass
 class TriggerRunUseCase:
-    def __init__(self, run_repo: RunRepository, experiment_repo: ExperimentRepository):
-        self.run_repo = run_repo
-        self.experiment_repo = experiment_repo
+    run_repo: RunRepository
+    experiment_repo: ExperimentRepository
 
     async def execute(self, command: TriggerRunCommand) -> Run:
         experiment = await self.experiment_repo.get(command.experiment_id)
@@ -21,17 +22,16 @@ class TriggerRunUseCase:
         run = Run(experiment_id=command.experiment_id, status=RunStatus.CREATED)
         return await self.run_repo.save(run)
 
+@dataclass
 class ListRunsUseCase:
-    def __init__(self, run_repo: RunRepository):
-        self.run_repo = run_repo
+    run_repo: RunRepository
 
-    async def execute(self, experiment_id: Optional[UUID] = None, status: Optional[str] = None) -> List[Run]:
+    async def execute(self, experiment_id: UUID | None = None, status: str | None = None) -> list[Run]:
         return await self.run_repo.list(experiment_id, status)
 
+@dataclass
 class GetRunUseCase:
-    def __init__(self, run_repo: RunRepository):
-        self.run_repo = run_repo
+    run_repo: RunRepository
 
-    async def execute(self, run_id: UUID) -> Optional[Run]:
+    async def execute(self, run_id: UUID) -> Run | None:
         return await self.run_repo.get(run_id)
-

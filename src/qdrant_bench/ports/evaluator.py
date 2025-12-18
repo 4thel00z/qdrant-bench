@@ -1,16 +1,19 @@
-from typing import Protocol, Dict, Any, List
 from dataclasses import dataclass
+from typing import Any, Protocol
+
 
 @dataclass
 class GroundTruth:
     # Map of query_index -> set of relevant_doc_ids
-    relevant_items: Dict[int, set]
+    relevant_items: dict[int, set]
+
 
 @dataclass
 class EvaluationResult:
-    scores: Dict[str, float]
+    scores: dict[str, float]
+
 
 class Evaluator(Protocol):
-    def evaluate(self, predictions: List[Any], ground_truth: GroundTruth, latencies: List[float]) -> EvaluationResult:
-        ...
-
+    def evaluate(
+        self, predictions: list[Any], ground_truth: GroundTruth, latencies: list[float]
+    ) -> EvaluationResult: ...

@@ -1,6 +1,5 @@
-from typing import Protocol, List
+from typing import Protocol
+
 
 class EmbeddingService(Protocol):
-    async def embed_text(self, texts: List[str], model: str) -> List[List[float]]:
-        ...
-
+    async def embed_text(self, texts: list[str], model: str) -> list[list[float]]: ...
