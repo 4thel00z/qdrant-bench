@@ -1,38 +1,52 @@
-from typing import List, Optional
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request
-from sqlalchemy.ext.asyncio import AsyncSession
-from qdrant_bench.presentation.api.dtos.models import RunResponse
-from qdrant_bench.domain.entities.core import RunStatus
-from qdrant_bench.application.usecases.runs.trigger import TriggerRunUseCase, TriggerRunCommand, ListRunsUseCase, GetRunUseCase
-from qdrant_bench.infrastructure.persistence.repositories.run import SqlAlchemyRunRepository
-from qdrant_bench.infrastructure.persistence.repositories.experiment import SqlAlchemyExperimentRepository
+
 import logfire
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
+
+from qdrant_bench.application.usecases.runs.trigger import (
+    GetRunUseCase,
+    ListRunsUseCase,
+    TriggerRunCommand,
+    TriggerRunUseCase,
+)
+from qdrant_bench.domain.entities.core import RunStatus
+from qdrant_bench.presentation.api.dependencies import (
+    get_execute_experiment_usecase,
+    get_get_run_usecase,
+    get_list_runs_usecase,
+    get_trigger_run_usecase,
+)
+from qdrant_bench.presentation.api.dtos.models import RunResponse
 
 router = APIRouter(tags=["Runs"])
 
-from qdrant_bench.presentation.api.dependencies import get_session
-
-async def execute_run_task(run_id: UUID):
-    # Placeholder for actual execution logic (AI-1)
+async def execute_run_task(run_id: UUID, request: Request):
     logfire.info(f"Starting execution for Run ID: {run_id}")
-    pass
 
-@router.post("/experiments/{experiment_id}/runs", response_model=RunResponse, status_code=202)
+    # We manually construct the session and dependencies for the background task
+    # because `Depends` only works in the request-response cycle context.
+    session_maker = request.app.state.sessionmaker
+
+    async with session_maker() as session:
+        # Use the factory function to get the use case with all dependencies wired
+        use_case = get_execute_experiment_usecase(session)
+
+        await use_case.execute(run_id)
+
+@router.post("/experiments/{experiment_id}/runs", status_code=202)
 async def trigger_run(
-    experiment_id: UUID, 
+    experiment_id: UUID,
     background_tasks: BackgroundTasks,
-    session: AsyncSession = Depends(get_session)
+    request: Request,
+    use_case: TriggerRunUseCase = Depends(get_trigger_run_usecase)
 ):
-    run_repo = SqlAlchemyRunRepository(session)
-    experiment_repo = SqlAlchemyExperimentRepository(session)
-    use_case = TriggerRunUseCase(run_repo, experiment_repo)
-    
     command = TriggerRunCommand(experiment_id=experiment_id)
-    
+
     try:
         run = await use_case.execute(command)
-        background_tasks.add_task(execute_run_task, run.id)
+        # Pass request to task to access app state (sessionmaker)
+        background_tasks.add_task(execute_run_task, run.id, request)
+
         return RunResponse(
             id=run.id,
             experiment_id=run.experiment_id,
@@ -44,15 +58,12 @@ async def trigger_run(
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-@router.get("/runs", response_model=List[RunResponse])
+@router.get("/runs")
 async def list_runs(
-    experiment_id: Optional[UUID] = None, 
-    status: Optional[RunStatus] = None, 
-    session: AsyncSession = Depends(get_session)
+    experiment_id: UUID | None = None,
+    status: RunStatus | None = None,
+    use_case: ListRunsUseCase = Depends(get_list_runs_usecase)
 ):
-    run_repo = SqlAlchemyRunRepository(session)
-    use_case = ListRunsUseCase(run_repo)
-    
     runs = await use_case.execute(experiment_id, status)
     return [
         RunResponse(
@@ -65,11 +76,11 @@ async def list_runs(
         ) for r in runs
     ]
 
-@router.get("/runs/{run_id}", response_model=RunResponse)
-async def get_run(run_id: UUID, session: AsyncSession = Depends(get_session)):
-    run_repo = SqlAlchemyRunRepository(session)
-    use_case = GetRunUseCase(run_repo)
-    
+@router.get("/runs/{run_id}")
+async def get_run(
+    run_id: UUID,
+    use_case: GetRunUseCase = Depends(get_get_run_usecase)
+):
     run = await use_case.execute(run_id)
     if run:
         return RunResponse(
