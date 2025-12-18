@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "qdrant-bench"
+version = "0.1.0"
+description = "Qdrant Benchmarking and Optimization Tool"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "typer",
+    "uvicorn",
+    "pydantic",
+    "pydantic-ai",
+    "structlog",
+    "logfire",
+    "opentelemetry-api",
+    "opentelemetry-sdk",
+    "opentelemetry-instrumentation-fastapi",
+    "opentelemetry-instrumentation-httpx",
+    "opentelemetry-instrumentation-asyncpg",
+    "asyncpg",
+    "sqlmodel",
+    "python-terraform",
+    "openai",
+    "httpx",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qdrant_bench"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
