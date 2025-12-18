@@ -176,3 +176,7 @@ cython_debug/
 # Logfire local credentials/state (never commit)
 .logfire/
 
+# Legacy local-only root files (keep around, never commit)
+Agent.md
+main.py
+
