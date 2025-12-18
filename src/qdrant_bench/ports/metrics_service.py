@@ -1,6 +1,7 @@
-from typing import Dict, Any, Protocol
+from typing import Any, Protocol
 
-class ClusterMetricsService(Protocol):
-    async def get_cluster_stats(self, connection_id: str) -> Dict[str, Any]:
-        ...
+from qdrant_bench.domain.entities.core import Connection
 
+
+class MetricsPort(Protocol):
+    async def get_cluster_stats(self, connection: Connection) -> dict[str, Any]: ...
