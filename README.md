@@ -12,6 +12,12 @@
   <a href="https://www.python.org/">
     <img src="https://img.shields.io/badge/Python-3.14+-blue.svg" alt="Python 3.14+">
   </a>
+  <a href="https://github.com/4thel00z/qdrant-bench/actions/workflows/ci.yml">
+    <img src="https://github.com/4thel00z/qdrant-bench/actions/workflows/ci.yml/badge.svg" alt="CI">
+  </a>
+  <a href="https://github.com/4thel00z/qdrant-bench/actions/workflows/e2e.yml">
+    <img src="https://github.com/4thel00z/qdrant-bench/actions/workflows/e2e.yml/badge.svg" alt="E2E (nightly)">
+  </a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT">
   </a>
