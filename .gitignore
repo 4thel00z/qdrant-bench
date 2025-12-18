@@ -180,3 +180,6 @@ cython_debug/
 Agent.md
 main.py
 
+# Local ticket archives (never commit)
+tickets/done/
+
