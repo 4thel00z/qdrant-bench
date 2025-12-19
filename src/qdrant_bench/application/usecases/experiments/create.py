@@ -26,8 +26,7 @@ class CreateExperimentUseCase:
             raise ValueError(f"Dataset {command.dataset_id} not found")
 
         validation_error = validate_vector_config_match(
-            vector_config=command.vector_config,
-            schema_config=dataset.schema_config
+            vector_config=command.vector_config, schema_config=dataset.schema_config
         )
         if validation_error:
             raise ValueError(validation_error)
@@ -51,10 +50,7 @@ class ListExperimentsUseCase:
         return await self.experiment_repo.list()
 
 
-def validate_vector_config_match(
-    vector_config: dict[str, Any],
-    schema_config: dict[str, Any]
-) -> str | None:
+def validate_vector_config_match(vector_config: dict[str, Any], schema_config: dict[str, Any]) -> str | None:
     """
     Pure validation function.
     Returns error message or None if valid.
@@ -70,10 +66,8 @@ def validate_vector_config_match(
 
     return "Dataset schema missing vector configuration"
 
-def validate_single_vector(
-    vector_config: dict[str, Any],
-    schema_vector: dict[str, Any]
-) -> str | None:
+
+def validate_single_vector(vector_config: dict[str, Any], schema_vector: dict[str, Any]) -> str | None:
     """Pure function - validate single vector config"""
     if "size" not in vector_config:
         return "vector_config missing 'size' field"
@@ -82,14 +76,12 @@ def validate_single_vector(
     actual_dim = vector_config.get("size")
 
     if expected_dim and expected_dim != actual_dim:
-        return  f"Dimension mismatch: dataset expects {expected_dim}, config has {actual_dim}"
+        return f"Dimension mismatch: dataset expects {expected_dim}, config has {actual_dim}"
 
     return None
 
-def validate_multi_vector(
-    vector_config: dict[str, Any],
-    dataset_vectors: dict[str, Any]
-) -> str | None:
+
+def validate_multi_vector(vector_config: dict[str, Any], dataset_vectors: dict[str, Any]) -> str | None:
     """Pure function - validate multi-vector config"""
     experiment_vectors = vector_config.get("vectors")
 

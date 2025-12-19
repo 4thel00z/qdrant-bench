@@ -1,4 +1,5 @@
 """Integration tests for dataset loader functions"""
+
 from qdrant_bench.infrastructure.persistence.dataset_loader import (
     derive_ground_truth_uri,
     derive_query_uri,
@@ -100,6 +101,3 @@ def test_multi_vector_dataset_fixture_has_valid_schema():
     assert "image" in dataset.schema_config["vectors"]
     assert dataset.schema_config["vectors"]["text"]["dim"] == 384
     assert dataset.schema_config["vectors"]["image"]["dim"] == 512
-
-
-

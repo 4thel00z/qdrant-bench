@@ -10,17 +10,15 @@ class CreateConnectionCommand:
     url: str
     api_key: str
 
+
 @dataclass
 class CreateConnectionUseCase:
     connection_repo: ConnectionRepository
 
     async def execute(self, command: CreateConnectionCommand) -> Connection:
-        connection = Connection(
-            name=command.name,
-            url=command.url,
-            api_key=command.api_key
-        )
+        connection = Connection(name=command.name, url=command.url, api_key=command.api_key)
         return await self.connection_repo.save(connection)
+
 
 @dataclass
 class ListConnectionsUseCase:
@@ -28,7 +26,3 @@ class ListConnectionsUseCase:
 
     async def execute(self) -> list[Connection]:
         return await self.connection_repo.list()
-
-
-
-

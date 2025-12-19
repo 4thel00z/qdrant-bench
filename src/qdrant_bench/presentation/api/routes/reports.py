@@ -8,11 +8,9 @@ from qdrant_bench.presentation.api.dependencies import get_generate_report_useca
 
 router = APIRouter(tags=["Reports"])
 
+
 @router.get("/reports/{experiment_id}", response_class=HTMLResponse)
-async def view_report(
-    experiment_id: str,
-    use_case: GenerateReportUseCase = Depends(get_generate_report_usecase)
-):
+async def view_report(experiment_id: str, use_case: GenerateReportUseCase = Depends(get_generate_report_usecase)):
     try:
         exp_uuid = UUID(experiment_id)
     except ValueError:

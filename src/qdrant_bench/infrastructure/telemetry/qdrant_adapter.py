@@ -34,8 +34,7 @@ class QdrantTelemetryAdapter(MetricsPort):
         with logfire.span(f"Fetching telemetry from {connection.url}"):
             try:
                 response = await self.http_client.get(
-                    f"{connection.url}/telemetry",
-                    headers={"api-key": connection.api_key}
+                    f"{connection.url}/telemetry", headers={"api-key": connection.api_key}
                 )
 
                 response.raise_for_status()
@@ -45,10 +44,7 @@ class QdrantTelemetryAdapter(MetricsPort):
                 return {
                     "ram_usage": telemetry_data.get("app", {}).get("memory_usage", 0),
                     "cpu_usage": telemetry_data.get("system", {}).get("cpu_load", 0.0),
-                    "points_count": sum(
-                        c.get("points_count", 0)
-                        for c in telemetry_data.get("collections", [])
-                    )
+                    "points_count": sum(c.get("points_count", 0) for c in telemetry_data.get("collections", [])),
                 }
             except Exception as e:
                 logfire.error(f"Failed to fetch telemetry: {e}")
@@ -64,7 +60,7 @@ class QdrantTelemetryAdapter(MetricsPort):
             try:
                 response = await self.http_client.get(
                     f"https://cloud.qdrant.io/api/v1/clusters/{cluster_id}/metrics",
-                    headers={"Authorization": f"Bearer {self.cloud_api_key}"}
+                    headers={"Authorization": f"Bearer {self.cloud_api_key}"},
                 )
 
                 response.raise_for_status()
@@ -73,7 +69,7 @@ class QdrantTelemetryAdapter(MetricsPort):
                 return {
                     "ram_usage": metrics.get("memory_bytes", 0),
                     "cpu_usage": metrics.get("cpu_percent", 0.0),
-                    "disk_usage": metrics.get("disk_bytes", 0)
+                    "disk_usage": metrics.get("disk_bytes", 0),
                 }
             except Exception as e:
                 logfire.error(f"Failed to fetch cloud metrics: {e}")

@@ -79,8 +79,12 @@ class VectorParams(TypedDict, total=False):
 class SearchParams(TypedDict, total=False):
     hnsw_ef: int | None
     exact: bool
-    quantization: QuantizationConfig | Any | None  # Can be specific config or general settings
+    quantization: models.QuantizationSearchParams | None
     indexed_only: bool
+
+
+def create_empty_search_params() -> SearchParams:
+    return {}
 
 
 @dataclass
@@ -88,7 +92,7 @@ class WorkloadConfig:
     k: int = 10
     query_count: int = 1000
     score_threshold: float | None = None
-    search_params: SearchParams = field(default_factory=dict)
+    search_params: SearchParams = field(default_factory=create_empty_search_params)
 
     def to_search_params(self) -> models.SearchParams:
         """Convert to Qdrant search params model"""
@@ -96,7 +100,7 @@ class WorkloadConfig:
             hnsw_ef=self.search_params.get("hnsw_ef"),
             exact=self.search_params.get("exact"),
             quantization=self.search_params.get("quantization"),
-            indexed_only=self.search_params.get("indexed_only")
+            indexed_only=self.search_params.get("indexed_only"),
         )
 
 

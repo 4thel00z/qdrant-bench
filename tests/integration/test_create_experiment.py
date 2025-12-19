@@ -1,4 +1,5 @@
 """Integration tests for CreateExperimentUseCase"""
+
 from uuid import uuid4
 
 import pytest
@@ -17,17 +18,14 @@ async def test_create_experiment_with_valid_config():
     dataset = create_test_dataset()
     await dataset_repo.save(dataset)
 
-    use_case = CreateExperimentUseCase(
-        experiment_repo=experiment_repo,
-        dataset_repo=dataset_repo
-    )
+    use_case = CreateExperimentUseCase(experiment_repo=experiment_repo, dataset_repo=dataset_repo)
 
     command = CreateExperimentCommand(
         name="test-experiment",
         dataset_id=dataset.id,
         connection_id=uuid4(),
         optimizer_config={"indexing_threshold": 20000},
-        vector_config={"size": 384, "distance": "COSINE"}
+        vector_config={"size": 384, "distance": "COSINE"},
     )
 
     experiment = await use_case.execute(command)
@@ -47,17 +45,14 @@ async def test_create_experiment_validation_fails_dimension_mismatch():
     dataset = create_test_dataset()
     await dataset_repo.save(dataset)
 
-    use_case = CreateExperimentUseCase(
-        experiment_repo=experiment_repo,
-        dataset_repo=dataset_repo
-    )
+    use_case = CreateExperimentUseCase(experiment_repo=experiment_repo, dataset_repo=dataset_repo)
 
     command = CreateExperimentCommand(
         name="test",
         dataset_id=dataset.id,
         connection_id=uuid4(),
         optimizer_config={},
-        vector_config={"size": 768}  # Wrong dimension
+        vector_config={"size": 768},  # Wrong dimension
     )
 
     with pytest.raises(ValueError) as exc:
@@ -75,17 +70,14 @@ async def test_create_experiment_fails_dataset_not_found():
     experiment_repo = FakeExperimentRepository()
     dataset_repo = FakeDatasetRepository()
 
-    use_case = CreateExperimentUseCase(
-        experiment_repo=experiment_repo,
-        dataset_repo=dataset_repo
-    )
+    use_case = CreateExperimentUseCase(experiment_repo=experiment_repo, dataset_repo=dataset_repo)
 
     command = CreateExperimentCommand(
         name="test",
         dataset_id=uuid4(),  # Non-existent dataset
         connection_id=uuid4(),
         optimizer_config={},
-        vector_config={"size": 384}
+        vector_config={"size": 384},
     )
 
     with pytest.raises(ValueError) as exc:
@@ -106,25 +98,14 @@ async def test_list_experiments_returns_all():
     dataset = create_test_dataset()
     await dataset_repo.save(dataset)
 
-    create_use_case = CreateExperimentUseCase(
-        experiment_repo=experiment_repo,
-        dataset_repo=dataset_repo
-    )
+    create_use_case = CreateExperimentUseCase(experiment_repo=experiment_repo, dataset_repo=dataset_repo)
 
     command1 = CreateExperimentCommand(
-        name="exp-1",
-        dataset_id=dataset.id,
-        connection_id=uuid4(),
-        optimizer_config={},
-        vector_config={"size": 384}
+        name="exp-1", dataset_id=dataset.id, connection_id=uuid4(), optimizer_config={}, vector_config={"size": 384}
     )
 
     command2 = CreateExperimentCommand(
-        name="exp-2",
-        dataset_id=dataset.id,
-        connection_id=uuid4(),
-        optimizer_config={},
-        vector_config={"size": 384}
+        name="exp-2", dataset_id=dataset.id, connection_id=uuid4(), optimizer_config={}, vector_config={"size": 384}
     )
 
     await create_use_case.execute(command1)
@@ -135,6 +116,3 @@ async def test_list_experiments_returns_all():
 
     assert len(experiments) == 2
     assert {exp.name for exp in experiments} == {"exp-1", "exp-2"}
-
-
-

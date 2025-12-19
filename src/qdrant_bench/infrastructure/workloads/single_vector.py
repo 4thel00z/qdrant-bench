@@ -21,10 +21,7 @@ class SingleVectorWorkload(Workload):
             raise ValueError(f"No queries loaded from dataset {dataset.name}")
 
         return await execute_search_batch(
-            client=client,
-            collection_name=collection_name,
-            queries=queries,
-            config=config
+            client=client, collection_name=collection_name, queries=queries, config=config
         )
 
 
@@ -36,36 +33,25 @@ async def load_query_vectors(dataset: Dataset, limit: int) -> list[list[float]]:
 
 
 async def execute_search_batch(
-    client: AsyncQdrantClient,
-    collection_name: str,
-    queries: list[list[float]],
-    config: WorkloadConfig
+    client: AsyncQdrantClient, collection_name: str, queries: list[list[float]], config: WorkloadConfig
 ) -> WorkloadResult:
     """Execute batch of searches and collect timing"""
     start_total = time.perf_counter()
 
-    results = await asyncio.gather(*[
-        execute_single_search(client, collection_name, query, config)
-        for query in queries
-    ])
+    results = await asyncio.gather(
+        *[execute_single_search(client, collection_name, query, config) for query in queries]
+    )
 
     total_duration = time.perf_counter() - start_total
 
     predictions = [r["prediction"] for r in results]
     latencies = [r["latency"] for r in results]
 
-    return WorkloadResult(
-        predictions=predictions,
-        latencies=latencies,
-        total_duration=total_duration
-    )
+    return WorkloadResult(predictions=predictions, latencies=latencies, total_duration=total_duration)
 
 
 async def execute_single_search(
-    client: AsyncQdrantClient,
-    collection_name: str,
-    query: list[float],
-    config: WorkloadConfig
+    client: AsyncQdrantClient, collection_name: str, query: list[float], config: WorkloadConfig
 ) -> dict[str, Any]:
     """Execute single search with timing"""
     start = time.perf_counter()
@@ -76,7 +62,7 @@ async def execute_single_search(
             query=query,
             limit=config.k,
             score_threshold=config.score_threshold,
-            search_params=config.to_search_params()
+            search_params=config.to_search_params(),
         )
 
     latency = time.perf_counter() - start

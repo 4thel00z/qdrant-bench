@@ -1,6 +1,6 @@
 import asyncio
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 import logfire
 import python_terraform
@@ -61,6 +61,8 @@ class QdrantCloudAdapter:
 
         # Fetch outputs
         outputs = self.tf.output()
+        if not outputs:
+            raise RuntimeError("Terraform output is empty")
 
         return ClusterConnectionInfo(
             cluster_id=outputs["cluster_id"]["value"],
@@ -74,7 +76,7 @@ class QdrantCloudAdapter:
 
     def destroy_sync(self, config: QdrantClusterConfig):
         vars = self.get_vars(config)
-        return_code, stdout, stderr = self.tf.destroy(var=vars, force=True)
+        return_code, stdout, stderr = cast(Any, self.tf).destroy(var=vars, force=True)
         if return_code != 0:
             logfire.error(f"Terraform destroy failed: {stderr}")
             raise RuntimeError(f"Terraform destroy failed: {stderr}")

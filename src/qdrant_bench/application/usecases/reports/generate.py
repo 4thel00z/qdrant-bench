@@ -18,7 +18,3 @@ class GenerateReportUseCase:
 
         runs = await self.run_repo.list(experiment_id=experiment_id)
         return self.report_generator.generate(experiment, runs)
-
-
-
-

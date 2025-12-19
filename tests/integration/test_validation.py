@@ -1,4 +1,5 @@
 """Integration tests for experiment validation"""
+
 from qdrant_bench.application.usecases.experiments.create import (
     validate_multi_vector,
     validate_single_vector,
@@ -51,10 +52,7 @@ def test_valid_multi_vector_config():
     """Valid multi-vector config passes validation"""
     dataset = create_multi_vector_dataset()
     vector_config = {
-        "vectors": {
-            "text": {"size": 384, "distance": "COSINE"},
-            "image": {"size": 512, "distance": "EUCLIDEAN"}
-        }
+        "vectors": {"text": {"size": 384, "distance": "COSINE"}, "image": {"size": 512, "distance": "EUCLIDEAN"}}
     }
 
     error = validate_multi_vector(vector_config, dataset.schema_config["vectors"])
@@ -75,11 +73,7 @@ def test_missing_vectors_field():
 def test_vector_not_in_dataset():
     """Vector not in dataset schema returns error"""
     dataset = create_multi_vector_dataset()
-    vector_config = {
-        "vectors": {
-            "audio": {"size": 256, "distance": "COSINE"}
-        }
-    }
+    vector_config = {"vectors": {"audio": {"size": 256, "distance": "COSINE"}}}
 
     error = validate_multi_vector(vector_config, dataset.schema_config["vectors"])
 
@@ -92,10 +86,7 @@ def test_dimension_mismatch_specific_vector():
     """Dimension mismatch for specific vector returns detailed error"""
     dataset = create_multi_vector_dataset()
     vector_config = {
-        "vectors": {
-            "text": {"size": 768, "distance": "COSINE"},
-            "image": {"size": 512, "distance": "EUCLIDEAN"}
-        }
+        "vectors": {"text": {"size": 768, "distance": "COSINE"}, "image": {"size": 512, "distance": "EUCLIDEAN"}}
     }
 
     error = validate_multi_vector(vector_config, dataset.schema_config["vectors"])
@@ -109,11 +100,7 @@ def test_dimension_mismatch_specific_vector():
 def test_partial_vectors_allowed():
     """Subset of vectors is allowed"""
     dataset = create_multi_vector_dataset()
-    vector_config = {
-        "vectors": {
-            "text": {"size": 384, "distance": "COSINE"}
-        }
-    }
+    vector_config = {"vectors": {"text": {"size": 384, "distance": "COSINE"}}}
 
     error = validate_multi_vector(vector_config, dataset.schema_config["vectors"])
 
@@ -133,12 +120,7 @@ def test_single_vector_validation_flow():
 def test_multi_vector_validation_flow():
     """Multi-vector validation delegates correctly"""
     dataset = create_multi_vector_dataset()
-    vector_config = {
-        "vectors": {
-            "text": {"size": 384},
-            "image": {"size": 512}
-        }
-    }
+    vector_config = {"vectors": {"text": {"size": 384}, "image": {"size": 512}}}
 
     error = validate_vector_config_match(vector_config, dataset.schema_config)
 
@@ -166,4 +148,3 @@ def test_dimension_error_propagates():
     assert "Dimension mismatch" in error
     assert "384" in error
     assert "1536" in error
-

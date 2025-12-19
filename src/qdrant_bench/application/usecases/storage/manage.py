@@ -12,6 +12,7 @@ class CreateStorageCommand:
     access_key: str
     secret_key: str
 
+
 @dataclass
 class CreateStorageUseCase:
     storage_repo: ObjectStorageRepository
@@ -27,11 +28,10 @@ class CreateStorageUseCase:
             )
         )
 
+
 @dataclass
 class ListStorageUseCase:
     storage_repo: ObjectStorageRepository
 
     async def execute(self) -> list[ObjectStorage]:
         return await self.storage_repo.list()
-
-

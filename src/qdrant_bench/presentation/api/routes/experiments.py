@@ -10,17 +10,17 @@ from qdrant_bench.presentation.api.dtos.models import CreateExperimentRequest, E
 
 router = APIRouter(prefix="/experiments", tags=["Experiments"])
 
+
 @router.post("", status_code=201)
 async def create_experiment(
-    request: CreateExperimentRequest,
-    use_case: CreateExperimentUseCase = Depends(get_create_experiment_usecase)
+    request: CreateExperimentRequest, use_case: CreateExperimentUseCase = Depends(get_create_experiment_usecase)
 ):
     command = CreateExperimentCommand(
         name=request.name,
         dataset_id=request.dataset_id,
         connection_id=request.connection_id,
         optimizer_config=request.optimizer_config,
-        vector_config=request.vector_config
+        vector_config=request.vector_config,
     )
 
     try:
@@ -31,15 +31,14 @@ async def create_experiment(
             dataset_id=experiment.dataset_id,
             connection_id=experiment.connection_id,
             optimizer_config=experiment.optimizer_config,
-            vector_config=experiment.vector_config
+            vector_config=experiment.vector_config,
         )
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
+
 
 @router.get("")
-async def list_experiments(
-    use_case: ListExperimentsUseCase = Depends(get_list_experiments_usecase)
-):
+async def list_experiments(use_case: ListExperimentsUseCase = Depends(get_list_experiments_usecase)):
     experiments = await use_case.execute()
 
     return [
@@ -49,6 +48,7 @@ async def list_experiments(
             dataset_id=exp.dataset_id,
             connection_id=exp.connection_id,
             optimizer_config=exp.optimizer_config,
-            vector_config=exp.vector_config
-        ) for exp in experiments
+            vector_config=exp.vector_config,
+        )
+        for exp in experiments
     ]

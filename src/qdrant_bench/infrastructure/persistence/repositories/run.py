@@ -44,6 +44,9 @@ class SqlAlchemyRunRepository(RunRepository):
         return [self.to_domain(run) for run in result.scalars().all()]
 
     def to_domain(self, db_run: DbRun) -> Run:
+        if not db_run.start_time:
+            raise RuntimeError(f"Run {db_run.id} has no start_time")
+
         return Run(
             id=db_run.id,
             experiment_id=db_run.experiment_id,

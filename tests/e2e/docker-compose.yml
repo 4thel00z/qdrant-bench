@@ -20,3 +20,4 @@ services:
     # No container healthcheck: the base image may not include curl/wget.
     # The pytest e2e fixtures poll the HTTP endpoint from the host instead.
 
+

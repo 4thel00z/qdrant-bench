@@ -9,6 +9,7 @@ from qdrant_bench.ports.repositories import ExperimentRepository, RunRepository
 class TriggerRunCommand:
     experiment_id: UUID
 
+
 @dataclass
 class TriggerRunUseCase:
     run_repo: RunRepository
@@ -22,12 +23,14 @@ class TriggerRunUseCase:
         run = Run(experiment_id=command.experiment_id, status=RunStatus.CREATED)
         return await self.run_repo.save(run)
 
+
 @dataclass
 class ListRunsUseCase:
     run_repo: RunRepository
 
     async def execute(self, experiment_id: UUID | None = None, status: str | None = None) -> list[Run]:
         return await self.run_repo.list(experiment_id, status)
+
 
 @dataclass
 class GetRunUseCase:

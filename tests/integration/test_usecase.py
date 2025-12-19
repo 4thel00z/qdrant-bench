@@ -1,4 +1,5 @@
 """Integration tests for ExecuteExperimentUseCase"""
+
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -39,7 +40,7 @@ async def test_execute_experiment_handles_missing_run():
         dataset_repo=dataset_repo,
         connection_repo=connection_repo,
         embedding_service=embedding_service,
-        telemetry_adapter=telemetry_adapter
+        telemetry_adapter=telemetry_adapter,
     )
 
     await use_case.execute(uuid4())
@@ -66,7 +67,7 @@ async def test_execute_experiment_handles_missing_experiment():
         dataset_repo=dataset_repo,
         connection_repo=connection_repo,
         embedding_service=embedding_service,
-        telemetry_adapter=telemetry_adapter
+        telemetry_adapter=telemetry_adapter,
     )
 
     await use_case.execute(run.id)
@@ -99,7 +100,7 @@ async def test_execute_experiment_handles_missing_dataset():
         dataset_repo=dataset_repo,
         connection_repo=connection_repo,
         embedding_service=embedding_service,
-        telemetry_adapter=telemetry_adapter
+        telemetry_adapter=telemetry_adapter,
     )
 
     await use_case.execute(run.id)
@@ -132,7 +133,7 @@ async def test_execute_experiment_handles_missing_connection():
         dataset_repo=dataset_repo,
         connection_repo=connection_repo,
         embedding_service=embedding_service,
-        telemetry_adapter=telemetry_adapter
+        telemetry_adapter=telemetry_adapter,
     )
 
     await use_case.execute(run.id)
@@ -169,16 +170,14 @@ async def test_execute_experiment_full_flow_with_mocked_data():
         dataset_repo=dataset_repo,
         connection_repo=connection_repo,
         embedding_service=embedding_service,
-        telemetry_adapter=telemetry_adapter
+        telemetry_adapter=telemetry_adapter,
     )
 
-    with patch('qdrant_bench.application.usecases.experiments.execute.load_dataset_corpus') as mock_corpus, \
-         patch('qdrant_bench.application.usecases.experiments.execute.load_ground_truth') as mock_gt:
-
-        mock_corpus.return_value = [
-            {"text": f"doc {i}", "metadata": {"id": i}}
-            for i in range(10)
-        ]
+    with (
+        patch("qdrant_bench.application.usecases.experiments.execute.load_dataset_corpus") as mock_corpus,
+        patch("qdrant_bench.application.usecases.experiments.execute.load_ground_truth") as mock_gt,
+    ):
+        mock_corpus.return_value = [{"text": f"doc {i}", "metadata": {"id": i}} for i in range(10)]
 
         mock_gt.return_value = GroundTruth(relevant_items={i: {i} for i in range(5)})
 

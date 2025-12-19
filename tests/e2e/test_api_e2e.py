@@ -93,5 +93,3 @@ def test_api_e2e_single_node_qdrant(tmp_path: Path, api_server: str) -> None:
     assert metrics["recall"] > 0.0, metrics
     assert "p95_latency" in metrics, metrics
     assert "qps" in metrics, metrics
-
-

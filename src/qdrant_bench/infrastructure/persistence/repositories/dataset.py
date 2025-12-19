@@ -22,8 +22,8 @@ class SqlAlchemyDatasetRepository(DatasetRepository):
         await self.session.refresh(db_ds)
         return self._map_to_domain(db_ds)
 
-    async def get(self, dataset_id: UUID) -> Dataset | None:
-        db_ds = await self.session.get(DbDataset, dataset_id)
+    async def get(self, id: UUID) -> Dataset | None:
+        db_ds = await self.session.get(DbDataset, id)
         if not db_ds:
             return None
         return self._map_to_domain(db_ds)

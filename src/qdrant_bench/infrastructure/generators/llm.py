@@ -11,8 +11,11 @@ from qdrant_bench.ports.generator import ParameterGenerator
 
 class QdrantConfig(BaseModel):
     optimizer_config: dict[str, Any] = Field(description="The optimizer configuration for Qdrant collection")
-    vector_config: dict[str, Any] = Field(description="The vector configuration for Qdrant collection (HNSW, quantization, etc.)")
+    vector_config: dict[str, Any] = Field(
+        description="The vector configuration for Qdrant collection (HNSW, quantization, etc.)"
+    )
     reasoning: str = Field(description="Explanation of why these parameters were chosen based on previous results")
+
 
 class LLMParameterGenerator(ParameterGenerator):
     def __init__(self, model_name: str = "openai:gpt-4o"):
@@ -28,21 +31,23 @@ class LLMParameterGenerator(ParameterGenerator):
                 - Quantization (Scalar/Product/Binary): Use for memory reduction. Trade-off: Precision loss.
                 - Optimizers: `indexing_threshold` controls when HNSW is built.
             Analyze the trade-offs (Recall vs Latency vs RAM) and propose the next step.
-           """
+           """,
         )
 
     async def suggest_next(self, previous_runs: list[Run], base_config: Experiment) -> Experiment:
         # Prepare context for the LLM
         history_context = []
         for run in previous_runs:
-            history_context.append({
-                "run_id": str(run.id),
-                "status": run.status,
-                "metrics": run.metrics,
-                # In a real scenario, we'd need to link the run back to the specific config used
-                # if it differed from the base_config (e.g. if we save the config on the run).
-                # For now, assuming previous runs might have varied slightly or we are evolving the base.
-            })
+            history_context.append(
+                {
+                    "run_id": str(run.id),
+                    "status": run.status,
+                    "metrics": run.metrics,
+                    # In a real scenario, we'd need to link the run back to the specific config used
+                    # if it differed from the base_config (e.g. if we save the config on the run).
+                    # For now, assuming previous runs might have varied slightly or we are evolving the base.
+                }
+            )
 
         prompt = (
             f"Base Configuration:\n"
@@ -64,7 +69,3 @@ class LLMParameterGenerator(ParameterGenerator):
             new_config.vector_config = suggestion.vector_config
 
             return new_config
-
-
-
-

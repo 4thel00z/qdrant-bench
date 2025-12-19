@@ -11,10 +11,7 @@ class RuleBasedGenerator(ParameterGenerator):
         strategy: 'heuristic' or 'grid'
         """
         self.strategy = strategy
-        self.grid_params = {
-            "m": [16, 24, 32, 48, 64],
-            "ef_construct": [100, 200, 300, 400]
-        }
+        self.grid_params = {"m": [16, 24, 32, 48, 64], "ef_construct": [100, 200, 300, 400]}
         self.grid_index = 0
 
     async def suggest_next(self, previous_runs: list[Run], base_config: Experiment) -> Experiment:
@@ -58,10 +55,7 @@ class RuleBasedGenerator(ParameterGenerator):
         if not latest:
             return base_config
 
-        new_vector_config = apply_heuristic_rules(
-            metrics=latest.metrics,
-            current_config=base_config.vector_config
-        )
+        new_vector_config = apply_heuristic_rules(metrics=latest.metrics, current_config=base_config.vector_config)
 
         return dataclasses.replace(base_config, vector_config=new_vector_config)
 
@@ -85,29 +79,12 @@ def apply_heuristic_rules(metrics: dict, current_config: dict) -> dict:
     current_m = hnsw.get("m", 16)
     current_ef = hnsw.get("ef_construct", 100)
 
-    new_m, new_ef = apply_tuning_rules(
-        recall=recall,
-        latency=p95_latency,
-        current_m=current_m,
-        current_ef=current_ef
-    )
+    new_m, new_ef = apply_tuning_rules(recall=recall, latency=p95_latency, current_m=current_m, current_ef=current_ef)
 
-    return {
-        **current_config,
-        "hnsw_config": {
-            **hnsw,
-            "m": new_m,
-            "ef_construct": new_ef
-        }
-    }
+    return {**current_config, "hnsw_config": {**hnsw, "m": new_m, "ef_construct": new_ef}}
 
 
-def apply_tuning_rules(
-    recall: float,
-    latency: float,
-    current_m: int,
-    current_ef: int
-) -> tuple[int, int]:
+def apply_tuning_rules(recall: float, latency: float, current_m: int, current_ef: int) -> tuple[int, int]:
     """Pure function - determine new parameters"""
     if recall < 0.85 and current_m < 64:
         return (current_m + 8, current_ef)

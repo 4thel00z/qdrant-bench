@@ -9,9 +9,4 @@ class ParameterGenerator(Protocol):
         self,
         previous_runs: list[Run],
         base_config: Experiment,
-    ) -> Awaitable[Experiment]:
-        ...
-
-
-
-
+    ) -> Awaitable[Experiment]: ...

@@ -1,4 +1,5 @@
 """Fake repository implementations for testing"""
+
 from dataclasses import dataclass, field
 from uuid import UUID
 
@@ -8,6 +9,7 @@ from qdrant_bench.domain.entities.core import Connection, Dataset, Experiment, O
 @dataclass
 class FakeRunRepository:
     """In-memory run repository"""
+
     runs: dict[UUID, Run] = field(default_factory=dict)
 
     async def save(self, run: Run) -> Run:
@@ -17,11 +19,7 @@ class FakeRunRepository:
     async def get(self, id: UUID) -> Run | None:
         return self.runs.get(id)
 
-    async def list(
-        self,
-        experiment_id: UUID | None = None,
-        status: str | None = None
-    ) -> list[Run]:
+    async def list(self, experiment_id: UUID | None = None, status: str | None = None) -> list[Run]:
         """Pure function - filter runs based on criteria"""
         runs = list(self.runs.values())
 
@@ -30,15 +28,13 @@ class FakeRunRepository:
             *([] if not status else [lambda r: r.status == status]),
         ]
 
-        return [
-            run for run in runs
-            if all(f(run) for f in filters)
-        ]
+        return [run for run in runs if all(f(run) for f in filters)]
 
 
 @dataclass
 class FakeExperimentRepository:
     """In-memory experiment repository"""
+
     experiments: dict[UUID, Experiment] = field(default_factory=dict)
 
     async def save(self, experiment: Experiment) -> Experiment:
@@ -55,6 +51,7 @@ class FakeExperimentRepository:
 @dataclass
 class FakeDatasetRepository:
     """In-memory dataset repository"""
+
     datasets: dict[UUID, Dataset] = field(default_factory=dict)
 
     async def save(self, dataset: Dataset) -> Dataset:
@@ -71,6 +68,7 @@ class FakeDatasetRepository:
 @dataclass
 class FakeConnectionRepository:
     """In-memory connection repository"""
+
     connections: dict[UUID, Connection] = field(default_factory=dict)
 
     async def save(self, connection: Connection) -> Connection:
@@ -87,6 +85,7 @@ class FakeConnectionRepository:
 @dataclass
 class FakeObjectStorageRepository:
     """In-memory object storage repository"""
+
     storages: dict[UUID, ObjectStorage] = field(default_factory=dict)
 
     async def save(self, storage: ObjectStorage) -> ObjectStorage:
@@ -95,6 +94,3 @@ class FakeObjectStorageRepository:
 
     async def list(self) -> list[ObjectStorage]:
         return list(self.storages.values())
-
-
-

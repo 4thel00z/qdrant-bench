@@ -35,5 +35,3 @@ def write_tiny_single_vector_dataset(
     pl.DataFrame(ground_truth).write_parquet(str(ground_truth_path))
 
     return corpus_path
-
-

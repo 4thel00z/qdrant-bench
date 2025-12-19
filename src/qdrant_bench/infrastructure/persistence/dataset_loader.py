@@ -1,6 +1,6 @@
 import asyncio
 import io
-from typing import Any
+from typing import Any, cast
 
 import aioboto3
 import httpx
@@ -26,10 +26,7 @@ async def load_ground_truth(dataset: Dataset) -> GroundTruth:
     gt_uri = derive_ground_truth_uri(dataset.source_uri)
     records = await load_from_uri(gt_uri, limit=None)
 
-    relevant_items = {
-        rec["query_id"]: set(rec["relevant_ids"])
-        for rec in records
-    }
+    relevant_items = {rec["query_id"]: set(rec["relevant_ids"]) for rec in records}
 
     return GroundTruth(relevant_items=relevant_items)
 
@@ -81,7 +78,7 @@ async def load_from_local(file_path: str, limit: int | None) -> list[dict[str, A
 async def download_from_s3(bucket: str, key: str) -> bytes:
     """Pure async function - download from S3"""
     session = aioboto3.Session()
-    async with session.client("s3") as s3:
+    async with cast(Any, session.client("s3")) as s3:
         response = await s3.get_object(Bucket=bucket, Key=key)
         return await response["Body"].read()
 
@@ -110,4 +107,3 @@ def derive_query_uri(source_uri: str) -> str:
 def derive_ground_truth_uri(source_uri: str) -> str:
     """Pure function - derive ground truth file path from corpus path"""
     return source_uri.replace(".parquet", ".ground_truth.parquet")
-

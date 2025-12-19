@@ -47,7 +47,7 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "e2e: End-to-end tests that require Docker (Qdrant + Postgres)")
 
 
-def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     if docker_is_available():
         return
 
@@ -86,6 +86,7 @@ def docker_compose_up() -> Generator[None, None, None]:
 
 @pytest.fixture(scope="session")
 def api_server(docker_compose_up: None) -> Generator[str, None, None]:
+    assert docker_compose_up is None
     api_port = 1338
     if is_port_open("127.0.0.1", api_port):
         raise RuntimeError(f"Port {api_port} is already in use; cannot run e2e API server")
@@ -119,4 +120,3 @@ def api_server(docker_compose_up: None) -> Generator[str, None, None]:
     finally:
         process.terminate()
         process.wait(timeout=10)
-

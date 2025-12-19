@@ -24,11 +24,7 @@ class MultiVectorWorkload(Workload):
             raise ValueError(f"No queries loaded from dataset {dataset.name}")
 
         return await execute_multi_vector_search_batch(
-            client=client,
-            collection_name=collection_name,
-            queries=queries,
-            vector_names=vector_names,
-            config=config
+            client=client, collection_name=collection_name, queries=queries, vector_names=vector_names, config=config
         )
 
 
@@ -38,17 +34,12 @@ def extract_vector_names(dataset: Dataset) -> list[str]:
 
 
 async def load_multi_vector_queries(
-    dataset: Dataset,
-    limit: int,
-    vector_names: list[str]
+    dataset: Dataset, limit: int, vector_names: list[str]
 ) -> list[dict[str, list[float]]]:
     """Pure async function - load queries with multiple named vectors"""
     query_records = await load_query_data(dataset, limit)
 
-    return [
-        {name: rec[f"{name}_vector"] for name in vector_names if f"{name}_vector" in rec}
-        for rec in query_records
-    ]
+    return [{name: rec[f"{name}_vector"] for name in vector_names if f"{name}_vector" in rec} for rec in query_records]
 
 
 async def execute_multi_vector_search_batch(
@@ -56,7 +47,7 @@ async def execute_multi_vector_search_batch(
     collection_name: str,
     queries: list[dict[str, list[float]]],
     vector_names: list[str],
-    config: WorkloadConfig
+    config: WorkloadConfig,
 ) -> WorkloadResult:
     """Execute batch of multi-vector searches"""
     start_total = time.perf_counter()
@@ -73,11 +64,7 @@ async def execute_multi_vector_search_batch(
     predictions = [r["prediction"] for r in results]
     latencies = [r["latency"] for r in results]
 
-    return WorkloadResult(
-        predictions=predictions,
-        latencies=latencies,
-        total_duration=total_duration
-    )
+    return WorkloadResult(predictions=predictions, latencies=latencies, total_duration=total_duration)
 
 
 async def execute_multi_vector_search(
@@ -85,7 +72,7 @@ async def execute_multi_vector_search(
     collection_name: str,
     query_bundle: dict[str, list[float]],
     primary_vector: str,
-    config: WorkloadConfig
+    config: WorkloadConfig,
 ) -> dict[str, Any]:
     """Execute single multi-vector search with timing"""
     start = time.perf_counter()
@@ -97,7 +84,7 @@ async def execute_multi_vector_search(
             using=primary_vector,
             limit=config.k,
             score_threshold=config.score_threshold,
-            search_params=config.to_search_params()
+            search_params=config.to_search_params(),
         )
 
     latency = time.perf_counter() - start
